@@ -415,6 +415,13 @@
     color: var(--muted);
     margin-top: 8px;
   }
+  .speak-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 20px auto;
+  }
   .speak-btn {
     width: 100px;
     height: 100px;
@@ -428,11 +435,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 20px auto;
     transition: transform 0.1s;
   }
+  .speak-btn.small { width: 60px; height: 60px; font-size: 26px; box-shadow: 0 4px 0 #2A9A92, 0 5px 12px rgba(78,205,196,0.3); }
   .speak-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #2A9A92; }
   .speak-btn.playing { animation: pulse 0.8s infinite; }
+  .speak-btn-slow {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD93D, #FFB800);
+    border: none;
+    color: var(--text);
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #D4B400, 0 6px 14px rgba(255,217,61,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+  }
+  .speak-btn-slow.small { width: 44px; height: 44px; font-size: 22px; box-shadow: 0 3px 0 #D4B400; }
+  .speak-btn-slow:active { transform: translateY(3px); box-shadow: 0 2px 0 #D4B400; }
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.08); }
@@ -746,6 +770,23 @@
     </div>
 
     <div class="pz-section">
+      <h3>🔊 הגדרות קול</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">
+        אם השמע לא ברור או מהיר מדי - תוכל לבחור קול אחר ומהירות מתאימה.
+      </p>
+      <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">בחירת קול</label>
+      <select class="pz-input" id="voiceSelect" style="font-family:inherit; direction:rtl;"></select>
+      <label style="display:block; font-size:13px; font-weight:600; margin: 12px 0 6px;">
+        מהירות: <span id="speedLabel" style="color:var(--secondary);">0.75</span>
+      </label>
+      <input type="range" id="speedSlider" min="0.5" max="1.1" step="0.05" style="width:100%; accent-color:var(--secondary);" />
+      <div class="pz-row" style="margin-top:12px">
+        <button class="pz-btn" onclick="saveVoiceSettings()">שמור</button>
+        <button class="pz-btn secondary" onclick="testVoiceSettings()">🔊 בדוק קול</button>
+      </div>
+    </div>
+
+    <div class="pz-section">
       <h3>📊 סטטיסטיקה - 7 ימים אחרונים</h3>
       <div class="stats-grid" id="pzStatsGrid"></div>
     </div>
@@ -901,12 +942,14 @@ const GRAMMAR = [
 ];
 
 // =============== STATE ===============
-let state = JSON.parse(localStorage.getItem('eng3-state') || '{"stars":0,"progress":{},"weakItems":{},"streak":0,"lastActiveDate":null,"syncUrl":""}');
+let state = JSON.parse(localStorage.getItem('eng3-state') || '{"stars":0,"progress":{},"weakItems":{},"streak":0,"lastActiveDate":null,"syncUrl":"","speechRate":0.75,"voiceName":""}');
 // Backfill any missing fields for older saved states
 if (!state.weakItems) state.weakItems = {};
 if (typeof state.streak !== 'number') state.streak = 0;
 if (state.lastActiveDate === undefined) state.lastActiveDate = null;
 if (typeof state.syncUrl !== 'string') state.syncUrl = '';
+if (typeof state.speechRate !== 'number') state.speechRate = 0.75;
+if (typeof state.voiceName !== 'string') state.voiceName = '';
 
 let currentLesson = null;
 let currentQuestions = [];
@@ -1008,24 +1051,73 @@ function renderReviewHero() {
 let voices = [];
 function loadVoices() {
   voices = speechSynthesis.getVoices();
+  // If the parent zone is open, refresh the voice dropdown now that voices are available
+  if (document.getElementById('parentZone') && document.getElementById('parentZone').classList.contains('active')) {
+    renderVoiceSettings();
+  }
 }
 if ('speechSynthesis' in window) {
   loadVoices();
   speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-function speak(text, rate = 0.85) {
+// Quality ranking: higher = preferred. Helps default voice picking.
+function voiceQualityScore(v) {
+  const name = v.name.toLowerCase();
+  let score = 0;
+  if (/natural|neural|premium|enhanced/.test(name)) score += 100;
+  if (name.includes('google')) score += 60;
+  if (/samantha|karen|moira|daniel|tessa|fiona|aria|jenny|libby/.test(name)) score += 50;
+  if (!v.localService) score += 20; // online voices are usually higher quality
+  if (v.lang === 'en-US') score += 10;
+  if (v.lang === 'en-GB') score += 8;
+  if (/female|woman/.test(name)) score += 3;
+  return score;
+}
+
+function getEnglishVoices() {
+  return voices
+    .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'))
+    .sort((a, b) => voiceQualityScore(b) - voiceQualityScore(a) || a.name.localeCompare(b.name));
+}
+
+function getActiveVoice() {
+  if (state.voiceName) {
+    const found = voices.find(v => v.name === state.voiceName);
+    if (found) return found;
+  }
+  // Auto: best-scoring English voice
+  const en = getEnglishVoices();
+  return en[0] || null;
+}
+
+function speak(text, rateOverride) {
   if (!('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US';
-  u.rate = rate;
-  u.pitch = 1.1;
-  const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female')) 
-                || voices.find(v => v.lang.startsWith('en-US'))
-                || voices.find(v => v.lang.startsWith('en'));
-  if (enVoice) u.voice = enVoice;
+  u.rate = rateOverride || state.speechRate || 0.75;
+  u.pitch = 1.05;
+  const v = getActiveVoice();
+  if (v) { u.voice = v; u.lang = v.lang; }
   speechSynthesis.speak(u);
+}
+
+function speakSlow(text) {
+  // 70% of the configured rate, with a hard floor for intelligibility
+  const r = Math.max(0.5, (state.speechRate || 0.75) * 0.7);
+  speak(text, r);
+}
+
+// Build the standard speak controls HTML (used inside lesson cards)
+function speakControls(text, small) {
+  const sz = small ? ' small' : '';
+  const safe = String(text).replace(/'/g, "\\'");
+  return `
+    <div class="speak-row">
+      <button class="speak-btn${sz}" onclick="speak('${safe}')">🔊</button>
+      <button class="speak-btn-slow${sz}" onclick="speakSlow('${safe}')" title="לאט יותר">🐢</button>
+    </div>`;
 }
 
 // =============== SESSION LOGGING ===============
@@ -1176,6 +1268,69 @@ function renderParentZone() {
   }
   // Populate Apps Script code
   document.getElementById('appsScriptCode').textContent = APPS_SCRIPT_CODE;
+
+  // Voice settings - populate dropdown and slider
+  renderVoiceSettings();
+}
+
+function accentTag(lang) {
+  const l = (lang || '').toLowerCase();
+  if (l.startsWith('en-us')) return '🇺🇸';
+  if (l.startsWith('en-gb')) return '🇬🇧';
+  if (l.startsWith('en-au')) return '🇦🇺';
+  if (l.startsWith('en-in')) return '🇮🇳';
+  if (l.startsWith('en-ca')) return '🇨🇦';
+  if (l.startsWith('en-ie')) return '🇮🇪';
+  return '🌐';
+}
+
+function renderVoiceSettings() {
+  const select = document.getElementById('voiceSelect');
+  const slider = document.getElementById('speedSlider');
+  const speedLabel = document.getElementById('speedLabel');
+  if (!select) return;
+
+  const en = getEnglishVoices();
+  if (en.length === 0) {
+    select.innerHTML = '<option>טוען קולות... נסה להחליף לדפדפן Chrome או רענן</option>';
+  } else {
+    select.innerHTML = '<option value="">🎯 אוטומטי - הקול הטוב ביותר במכשיר</option>' +
+      en.map(v => {
+        const tag = accentTag(v.lang);
+        const natural = /natural|neural|premium|enhanced/i.test(v.name) ? ' ✨' : '';
+        return `<option value="${v.name}" ${v.name === state.voiceName ? 'selected' : ''}>${tag} ${v.name}${natural}</option>`;
+      }).join('');
+  }
+  slider.value = state.speechRate || 0.75;
+  speedLabel.textContent = (state.speechRate || 0.75).toFixed(2);
+  slider.oninput = () => {
+    speedLabel.textContent = parseFloat(slider.value).toFixed(2);
+  };
+}
+
+function saveVoiceSettings() {
+  const select = document.getElementById('voiceSelect');
+  const slider = document.getElementById('speedSlider');
+  state.voiceName = select.value || '';
+  state.speechRate = parseFloat(slider.value) || 0.75;
+  saveState();
+  showFeedback('הגדרות נשמרו ✓', true);
+}
+
+function testVoiceSettings() {
+  if (!('speechSynthesis' in window)) { showFeedback('הדפדפן לא תומך בקול', false); return; }
+  const select = document.getElementById('voiceSelect');
+  const slider = document.getElementById('speedSlider');
+  const chosenName = select.value || '';
+  const chosenRate = parseFloat(slider.value) || 0.75;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance('Hello! My name is your English teacher. Let us learn together.');
+  u.rate = chosenRate;
+  u.pitch = 1.05;
+  let v = chosenName ? voices.find(x => x.name === chosenName) : null;
+  if (!v) v = getEnglishVoices()[0] || null;
+  if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = 'en-US'; }
+  speechSynthesis.speak(u);
 }
 
 function toggleInstructions() {
@@ -1486,7 +1641,7 @@ function renderQuestion() {
     c.innerHTML = `
       <div class="exercise-card">
         <div class="question-label">לחץ והקשב למילה</div>
-        <button class="speak-btn" onclick="speak('${item.word.en}')">🔊</button>
+        ${speakControls(item.word.en, false)}
         <div class="question-label">איזה תרגום נכון?</div>
       </div>
       <div class="options">
@@ -1500,7 +1655,7 @@ function renderQuestion() {
     c.innerHTML = `
       <div class="exercise-card">
         <div class="question-label">לחץ והקשב</div>
-        <button class="speak-btn" onclick="speak('${item.word.en}')">🔊</button>
+        ${speakControls(item.word.en, false)}
         <div class="question-label">איזו תמונה מתאימה?</div>
       </div>
       <div class="options">
@@ -1513,7 +1668,7 @@ function renderQuestion() {
     c.innerHTML = `
       <div class="exercise-card">
         <div class="question-label">תקשיב והקלד באנגלית</div>
-        <button class="speak-btn" onclick="speak('${item.word.en}')">🔊</button>
+        ${speakControls(item.word.en, false)}
         <div class="hebrew-translation">רמז: ${item.word.he} ${item.word.emoji}</div>
         <input type="text" class="text-input" id="userInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
       </div>
@@ -1530,7 +1685,7 @@ function renderQuestion() {
       <div class="exercise-card">
         <div class="question-label">קרא את המילה ובחר תרגום</div>
         <div class="question-text">${item.word.en}</div>
-        <button class="speak-btn" style="width:60px;height:60px;font-size:26px" onclick="speak('${item.word.en}')">🔊</button>
+        ${speakControls(item.word.en, true)}
       </div>
       <div class="options">
         ${opts.map(o => `<button class="option" onclick="answerChoice(this, '${o.en === item.word.en}')">${o.he}</button>`).join('')}
@@ -1568,11 +1723,12 @@ function renderQuestion() {
   else if (id === 'read-sentence') {
     const s = item.sent;
     const opts = shuffle(s.opts);
+    const safeSent = s.en.replace(/'/g, "\\'");
     c.innerHTML = `
       <div class="exercise-card">
         <div class="question-label">קרא את המשפט</div>
         <div class="sentence-display">${s.en}</div>
-        <button class="speak-btn" style="width:60px;height:60px;font-size:26px" onclick="speak('${s.en}', 0.8)">🔊</button>
+        ${speakControls(s.en, true)}
         <div class="question-label" style="margin-top:14px">${s.q}</div>
       </div>
       <div class="options single-col">
@@ -1587,7 +1743,7 @@ function renderQuestion() {
       <div class="exercise-card">
         <div class="question-label">סדר את האותיות למילה הנכונה</div>
         <div class="hebrew-translation">${item.word.he} ${item.word.emoji}</div>
-        <button class="speak-btn" style="width:60px;height:60px;font-size:26px;margin:14px auto" onclick="speak('${word}')">🔊</button>
+        ${speakControls(word, true)}
         <div class="letter-output" id="letterOutput"></div>
         <div class="letter-bank" id="letterBank"></div>
       </div>
@@ -1621,7 +1777,7 @@ function renderQuestion() {
     c.innerHTML = `
       <div class="exercise-card">
         <div class="question-label">תקשיב והקלד את המילה באנגלית</div>
-        <button class="speak-btn" onclick="speak('${item.word.en}')">🔊</button>
+        ${speakControls(item.word.en, false)}
         <input type="text" class="text-input" id="userInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
       </div>
       <button class="submit-btn" onclick="checkTyped('${item.word.en}')">בדוק</button>
