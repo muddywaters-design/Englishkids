@@ -900,6 +900,27 @@ const VOCAB = [
   { en: "flower", he: "פרח", emoji: "🌸" },
   { en: "car", he: "מכונית", emoji: "🚗" },
   { en: "ball", he: "כדור", emoji: "⚽" },
+  // === Added from Grade 3 test ===
+  { en: "hen", he: "תרנגולת", emoji: "🐔" },
+  { en: "sheep", he: "כבשה", emoji: "🐑" },
+  { en: "duck", he: "ברווז", emoji: "🦆" },
+  { en: "hat", he: "כובע", emoji: "🎩" },
+  { en: "balloon", he: "בלון", emoji: "🎈" },
+  { en: "cheese", he: "גבינה", emoji: "🧀" },
+  { en: "carrot", he: "גזר", emoji: "🥕" },
+  { en: "grapes", he: "ענבים", emoji: "🍇" },
+  { en: "strawberry", he: "תות", emoji: "🍓" },
+  { en: "boy", he: "ילד", emoji: "👦" },
+  { en: "girl", he: "ילדה", emoji: "👧" },
+  { en: "bus", he: "אוטובוס", emoji: "🚌" },
+  { en: "plane", he: "מטוס", emoji: "✈️" },
+  { en: "boat", he: "סירה", emoji: "⛵" },
+  { en: "pencil", he: "עיפרון", emoji: "✏️" },
+  { en: "scissors", he: "מספריים", emoji: "✂️" },
+  { en: "big", he: "גדול", emoji: "🐘" },
+  { en: "small", he: "קטן", emoji: "🐭" },
+  { en: "happy", he: "שמח", emoji: "😊" },
+  { en: "sad", he: "עצוב", emoji: "😢" },
 ];
 
 const SENTENCES = [
@@ -941,6 +962,114 @@ const GRAMMAR = [
   { type: "choose", q: "He ___ two cats.", he: "יש לו שני חתולים", a: "has", opts: ["have", "has"], explain: "אחרי He → has" },
 ];
 
+// CVC words with short vowels - core of grade 3 phonics
+const PHONICS = [
+  // Short 'a'
+  { word: "cat", vowel: "a" }, { word: "hat", vowel: "a" }, { word: "mat", vowel: "a" },
+  { word: "bag", vowel: "a" }, { word: "pan", vowel: "a" }, { word: "man", vowel: "a" },
+  { word: "fat", vowel: "a" }, { word: "sat", vowel: "a" }, { word: "dad", vowel: "a" },
+  // Short 'e'
+  { word: "hen", vowel: "e" }, { word: "ten", vowel: "e" }, { word: "bed", vowel: "e" },
+  { word: "pen", vowel: "e" }, { word: "pet", vowel: "e" }, { word: "red", vowel: "e" },
+  { word: "leg", vowel: "e" }, { word: "net", vowel: "e" }, { word: "wet", vowel: "e" },
+  // Short 'i'
+  { word: "pin", vowel: "i" }, { word: "sit", vowel: "i" }, { word: "big", vowel: "i" },
+  { word: "hit", vowel: "i" }, { word: "fit", vowel: "i" }, { word: "lip", vowel: "i" },
+  { word: "six", vowel: "i" }, { word: "fish", vowel: "i" }, { word: "tin", vowel: "i" },
+  // Short 'o'
+  { word: "dog", vowel: "o" }, { word: "hot", vowel: "o" }, { word: "top", vowel: "o" },
+  { word: "box", vowel: "o" }, { word: "fox", vowel: "o" }, { word: "pot", vowel: "o" },
+  { word: "log", vowel: "o" },
+  // Short 'u'
+  { word: "cup", vowel: "u" }, { word: "bus", vowel: "u" }, { word: "run", vowel: "u" },
+  { word: "sun", vowel: "u" }, { word: "fun", vowel: "u" }, { word: "bug", vowel: "u" },
+  { word: "hug", vowel: "u" }, { word: "mud", vowel: "u" },
+];
+
+// Stories with Yes/No comprehension - like the test's "Dan Has a Fat Hen"
+const STORIES = [
+  {
+    title: "Dan Has a Fat Hen",
+    titleHe: "לדן יש תרנגולת שמנה",
+    lines: [
+      "I see Dan.",
+      "Dan is a man.",
+      "Dan sits on the mat.",
+      "Dan has a fat hen.",
+      "The fat hen has a big hat.",
+      "The fat hen sees ten eggs in a pan."
+    ],
+    questions: [
+      { q: "Dan is a man.", a: "Yes" },
+      { q: "Dan has a fat hen.", a: "Yes" },
+      { q: "The fat hen has a pen.", a: "No" },
+      { q: "The fat hen sits on Dan.", a: "No" },
+      { q: "The fat hen sees ten eggs.", a: "Yes" },
+      { q: "Dan sits in the pan.", a: "No" }
+    ]
+  },
+  {
+    title: "Sam and His Cat",
+    titleHe: "סם והחתול שלו",
+    lines: [
+      "Sam is a boy.",
+      "Sam has a small red cat.",
+      "The cat sits on the bed.",
+      "Sam and the cat run in the sun.",
+      "Sam is happy."
+    ],
+    questions: [
+      { q: "Sam is a girl.", a: "No" },
+      { q: "Sam has a cat.", a: "Yes" },
+      { q: "The cat is big.", a: "No" },
+      { q: "The cat is red.", a: "Yes" },
+      { q: "Sam is sad.", a: "No" },
+      { q: "Sam runs in the sun.", a: "Yes" }
+    ]
+  },
+  {
+    title: "The Big Red Bus",
+    titleHe: "האוטובוס האדום הגדול",
+    lines: [
+      "I see a big red bus.",
+      "A boy and a girl sit on the bus.",
+      "The boy has a bag.",
+      "The girl has a book.",
+      "They are happy."
+    ],
+    questions: [
+      { q: "The bus is small.", a: "No" },
+      { q: "The bus is red.", a: "Yes" },
+      { q: "A boy sits on the bus.", a: "Yes" },
+      { q: "The boy has a book.", a: "No" },
+      { q: "The girl has a book.", a: "Yes" },
+      { q: "They are sad.", a: "No" }
+    ]
+  },
+  {
+    title: "My Mother is Happy",
+    titleHe: "אמא שלי שמחה",
+    lines: [
+      "My mother has a cake.",
+      "The cake is big.",
+      "My father, my sister and I see the cake.",
+      "We eat the cake.",
+      "We are very happy!"
+    ],
+    questions: [
+      { q: "My mother has a book.", a: "No" },
+      { q: "The cake is big.", a: "Yes" },
+      { q: "My father sees the cake.", a: "Yes" },
+      { q: "We are sad.", a: "No" },
+      { q: "We eat the cake.", a: "Yes" }
+    ]
+  }
+];
+
+// Uppercase / lowercase pairs - all 26 letters
+const LETTER_PAIRS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(L => ({ upper: L, lower: L.toLowerCase() }));
+
+
 // =============== STATE ===============
 let state = JSON.parse(localStorage.getItem('eng3-state') || '{"stars":0,"progress":{},"weakItems":{},"streak":0,"lastActiveDate":null,"syncUrl":"","speechRate":0.75,"voiceName":""}');
 // Backfill any missing fields for older saved states
@@ -959,7 +1088,14 @@ let currentCategory = null;
 let currentItemKey = null;
 let currentSession = null;
 
-function saveState() { localStorage.setItem('eng3-state', JSON.stringify(state)); updateUI(); }
+function saveState() {
+  try {
+    localStorage.setItem('eng3-state', JSON.stringify(state));
+  } catch (e) {
+    console.warn('Could not save state:', e);
+  }
+  updateUI();
+}
 
 function todayStr() {
   const d = new Date();
@@ -1125,9 +1261,12 @@ const LESSON_LABELS = {
   'listen-word': 'הקשבה: בחר מילה',
   'listen-emoji': 'הקשבה: בחר תמונה',
   'listen-type': 'הקשבה: הקלד',
+  'listen-phonics': 'הקשבה: תנועה חסרה',
   'read-word': 'קריאה: בחר תרגום',
   'read-match': 'קריאה: התאם זוגות',
   'read-sentence': 'קריאה: הבנת הנקרא',
+  'read-letters': 'קריאה: אותיות גדולות/קטנות',
+  'read-story': 'קריאה: סיפור עם שאלות',
   'write-spell': 'כתיבה: סדר אותיות',
   'write-translate': 'כתיבה: תרגם',
   'write-listen': 'כתיבה: שמע והקלד',
@@ -1166,7 +1305,11 @@ function endSession(status) {
   try { sessions = JSON.parse(localStorage.getItem('eng3-sessions') || '[]'); } catch(e) {}
   sessions.unshift(sess);
   while (sessions.length > 200) sessions.pop();
-  localStorage.setItem('eng3-sessions', JSON.stringify(sessions));
+  try {
+    localStorage.setItem('eng3-sessions', JSON.stringify(sessions));
+  } catch (e) {
+    console.warn('Could not save session:', e);
+  }
   // Sync to Google Sheets if configured
   syncSession(sess);
 }
@@ -1403,7 +1546,12 @@ function testSync() {
 function buildCSV() {
   const sessions = getSessions();
   // BOM for Excel/Sheets UTF-8 detection
-  let csv = '\ufeffתאריך,שעה,תרגול,קטגוריה,סטטוס,נכון,נענו,סה"כ,משך(ש),ציון %\n';
+  const q = (s) => {
+    const str = String(s == null ? '' : s);
+    // Always quote and escape inner quotes - safe for any content
+    return '"' + str.replace(/"/g, '""') + '"';
+  };
+  let csv = '\ufeff' + ['תאריך','שעה','תרגול','קטגוריה','סטטוס','נכון','נענו','סה"כ','משך(ש)','ציון %'].map(q).join(',') + '\n';
   sessions.forEach(s => {
     const d = new Date(s.startedAt);
     const date = d.toLocaleDateString('he-IL');
@@ -1412,7 +1560,7 @@ function buildCSV() {
     const cat = CATEGORY_LABELS[s.category] || s.category;
     const status = s.status === 'completed' ? 'הושלם' : 'נטוש';
     const score = s.totalQuestions > 0 ? Math.round(100 * s.correctAnswers / s.totalQuestions) : 0;
-    csv += `${date},${time},"${lesson}","${cat}",${status},${s.correctAnswers},${s.questionsAnswered},${s.totalQuestions},${s.durationSeconds || 0},${score}\n`;
+    csv += [date, time, lesson, cat, status, s.correctAnswers, s.questionsAnswered, s.totalQuestions, s.durationSeconds || 0, score].map(q).join(',') + '\n';
   });
   return csv;
 }
@@ -1489,14 +1637,17 @@ const LESSON_CATEGORIES = {
       { id: "listen-word", icon: "🔊", color: "#4ECDC4", title: "תקשיב ובחר מילה", desc: "תשמע מילה ובחר את התרגום" },
       { id: "listen-emoji", icon: "🖼️", color: "#A78BFA", title: "תקשיב ובחר תמונה", desc: "תשמע ובחר תמונה מתאימה" },
       { id: "listen-type", icon: "⌨️", color: "#FF9F45", title: "תקשיב והקלד", desc: "תשמע מילה והקלד אותה" },
+      { id: "listen-phonics", icon: "🎯", color: "#FF6B6B", title: "תנועה חסרה", desc: "תשמע ובחר את האות שחסרה" },
     ]
   },
   read: {
     title: "📖 קריאה",
     lessons: [
+      { id: "read-letters", icon: "🔠", color: "#FFD93D", title: "אותיות A↔a", desc: "התאם אות גדולה לאות קטנה" },
       { id: "read-word", icon: "🔤", color: "#A78BFA", title: "קרא מילה ובחר", desc: "קרא ובחר תרגום נכון" },
       { id: "read-match", icon: "🔗", color: "#FF6B6B", title: "התאם זוגות", desc: "התאם אנגלית-עברית" },
       { id: "read-sentence", icon: "📝", color: "#6BCB77", title: "הבנת הנקרא", desc: "קרא משפט וענה" },
+      { id: "read-story", icon: "📚", color: "#4ECDC4", title: "סיפור ושאלות", desc: "קרא סיפור וענה Yes/No" },
     ]
   },
   write: {
@@ -1574,6 +1725,15 @@ function generateReviewQuestions(weakKeys) {
     } else if (type === 's') {
       const s = SENTENCES.find(se => se.en === id);
       if (s) items.push({ sent: s, format: 'read-sentence', _key: key });
+    } else if (type === 'p') {
+      const p = PHONICS.find(ph => ph.word === id);
+      if (p) items.push({ phonic: p, format: 'listen-phonics', _key: key });
+    } else if (type === 'sq') {
+      // Find the story containing this question
+      for (const story of STORIES) {
+        const sq = story.questions.find(q => q.q === id);
+        if (sq) { items.push({ story, sq, format: 'read-story', _key: key }); break; }
+      }
     }
   });
   return items;
@@ -1610,6 +1770,19 @@ function generateQuestions(id) {
   } else if (id === 'grammar-mix') {
     const gs = pick(GRAMMAR, Math.min(GRAMMAR.length, n));
     gs.forEach(g => items.push({ g }));
+  } else if (id === 'listen-phonics') {
+    const ps = pick(PHONICS, n);
+    ps.forEach(p => items.push({ phonic: p }));
+  } else if (id === 'read-letters') {
+    // 3 groups of 4 letter pairs for matching
+    for (let i = 0; i < 3; i++) {
+      const group = pick(LETTER_PAIRS, 4);
+      items.push({ letterPairs: group });
+    }
+  } else if (id === 'read-story') {
+    // Pick 1 story, use all its questions
+    const story = pickOne(STORIES);
+    story.questions.forEach(sq => items.push({ story, sq }));
   }
   return items;
 }
@@ -1634,6 +1807,8 @@ function renderQuestion() {
   else if (item.word) currentItemKey = 'v:' + item.word.en;
   else if (item.g) currentItemKey = 'g:' + item.g.q;
   else if (item.sent) currentItemKey = 's:' + item.sent.en;
+  else if (item.phonic) currentItemKey = 'p:' + item.phonic.word;
+  else if (item.story && item.sq) currentItemKey = 'sq:' + item.sq.q;
   else currentItemKey = null; // match game records per-pair
 
   if (id === 'listen-word') {
@@ -1801,6 +1976,77 @@ function renderQuestion() {
       </div>
     `;
   }
+  else if (id === 'listen-phonics') {
+    const p = item.phonic;
+    const word = p.word;
+    // Always replace the middle (position 1) for CVC words
+    const display = word[0] + ' _ ' + word[2];
+    const allVowels = ['a', 'e', 'i', 'o', 'u'];
+    // For grade 3 - show 3 vowels (correct + 2 confusable distractors)
+    const distractors = pick(allVowels.filter(v => v !== p.vowel), 2);
+    const opts = shuffle([p.vowel, ...distractors]);
+    c.innerHTML = `
+      <div class="exercise-card">
+        <div class="question-label">תקשיב והשלם את התנועה החסרה</div>
+        ${speakControls(word, false)}
+        <div class="question-text" style="letter-spacing: 6px; font-size: 56px;">${display}</div>
+      </div>
+      <div class="options">
+        ${opts.map(o => `<button class="option english" style="font-size: 32px; min-height: 70px;" onclick="answerChoice(this, '${o === p.vowel}')">${o}</button>`).join('')}
+      </div>
+    `;
+    setTimeout(() => speak(word), 350);
+  }
+  else if (id === 'read-letters') {
+    const pairs = item.letterPairs;
+    const upperTiles = shuffle(pairs.map(p => ({ side: 'u', upper: p.upper, lower: p.lower })));
+    const lowerTiles = shuffle(pairs.map(p => ({ side: 'l', upper: p.upper, lower: p.lower })));
+    c.innerHTML = `
+      <div class="exercise-card">
+        <div class="question-label">התאם אות גדולה לאות קטנה</div>
+        <div class="match-grid" id="matchGrid"></div>
+      </div>
+    `;
+    const grid = document.getElementById('matchGrid');
+    for (let i = 0; i < pairs.length; i++) {
+      const u = upperTiles[i], l = lowerTiles[i];
+      const uBtn = document.createElement('div');
+      uBtn.className = 'match-tile english';
+      uBtn.textContent = u.upper;
+      uBtn.dataset.en = u.upper.toLowerCase();
+      uBtn.dataset.kind = 'letter';
+      uBtn.style.fontSize = '32px';
+      uBtn.onclick = () => selectMatch(uBtn);
+      grid.appendChild(uBtn);
+      const lBtn = document.createElement('div');
+      lBtn.className = 'match-tile english';
+      lBtn.textContent = l.lower;
+      lBtn.dataset.en = l.upper.toLowerCase();
+      lBtn.dataset.kind = 'letter';
+      lBtn.style.fontSize = '32px';
+      lBtn.onclick = () => selectMatch(lBtn);
+      grid.appendChild(lBtn);
+    }
+  }
+  else if (id === 'read-story') {
+    const { story, sq } = item;
+    const fullStory = story.lines.join(' ');
+    const opts = ['Yes', 'No']; // Keep order consistent for muscle memory
+    c.innerHTML = `
+      <div class="exercise-card">
+        <div class="question-label">${story.titleHe}</div>
+        <div class="sentence-display" style="text-align:left;font-size:16px;line-height:1.7;direction:ltr">
+          ${story.lines.join('<br>')}
+        </div>
+        ${speakControls(fullStory, true)}
+        <div class="question-label" style="margin-top:14px">האם המשפט נכון?</div>
+        <div class="question-text" style="font-size:22px">${sq.q}</div>
+      </div>
+      <div class="options">
+        ${opts.map(o => `<button class="option english" onclick="answerChoice(this, '${o === sq.a}')">${o === 'Yes' ? '✓ Yes' : '✗ No'}</button>`).join('')}
+      </div>
+    `;
+  }
 }
 
 // =============== ANSWER HANDLERS ===============
@@ -1931,9 +2177,9 @@ function selectMatch(tile) {
     matchedCount++;
     currentScore++;
     state.stars++;
-    speak(tile.dataset.en);
+    if (tile.dataset.kind !== 'letter') speak(tile.dataset.en);
     logAnswer(true);
-    recordResult('v:' + tile.dataset.en, true);
+    if (tile.dataset.kind !== 'letter') recordResult('v:' + tile.dataset.en, true);
     bumpStreak();
     saveState();
     if (matchedCount === 4) {
@@ -1946,8 +2192,10 @@ function selectMatch(tile) {
     tile.classList.add('wrong-match');
     matchSelected.classList.add('wrong-match');
     logAnswer(false);
-    recordResult('v:' + tile.dataset.en, false);
-    recordResult('v:' + matchSelected.dataset.en, false);
+    if (tile.dataset.kind !== 'letter') {
+      recordResult('v:' + tile.dataset.en, false);
+      recordResult('v:' + matchSelected.dataset.en, false);
+    }
     bumpStreak();
     saveState();
     const prev = matchSelected;
